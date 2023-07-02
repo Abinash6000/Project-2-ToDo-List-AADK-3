@@ -2,6 +2,13 @@ package com.example.project2_todolistapp
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import androidx.room.Room
+import com.example.project2_todolistapp.databinding.ActivityMainBinding
+import com.example.project2_todolistapp.db.Todo
+import com.example.project2_todolistapp.db.TodoListDatabase
+import java.util.Date
 
 // TODO 4: Create a ViewHolder for the Recycler View
 // TODO 5: Create an Adapter for the Recycler View
@@ -24,8 +31,30 @@ import android.os.Bundle
 // 9. Add new screen to display the tasks that are done
 
 class MainActivity : AppCompatActivity() {
+    private lateinit var binding: ActivityMainBinding
+    private lateinit var database: TodoListDatabase
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+
+        database = Room.databaseBuilder(
+            this@MainActivity,
+            TodoListDatabase::class.java,
+            "todoListDB"
+        ).build()
+
+        val todo = Todo(
+            title = "RamdomTodoTitle",
+            desc = "RandomTodoDesc",
+            date = Date(System.currentTimeMillis())
+        )
+        Thread {
+            database.todoDao().insertTodo(todo)
+        }
+
+        binding.rvTodoList.layoutManager = LinearLayoutManager(this, RecyclerView.VERTICAL, false)
+        binding.rvTodoList.adapter = TodoListAdapter(mutableListOf(todo))
+
     }
 }
