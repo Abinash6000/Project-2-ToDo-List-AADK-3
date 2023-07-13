@@ -11,12 +11,14 @@ class TodoListViewHolder(private val itemBinding: TodoListItemBinding): Recycler
         itemBinding.cbItemTodo.isChecked = todo.isMarkedDone
         itemBinding.tvItemTodoTitle.text = todo.title
         itemBinding.tvItemTodoDesc.text = todo.desc
-        itemBinding.tvItemTodoDate.text = todo.date.toString()
+        val wholeDate = todo.date.toString().split(":")
+        val date = wholeDate[0] + wholeDate[1]
+        itemBinding.tvItemTodoDate.text = date
     }
 }
 
 class TodoListAdapter(
-    private val listOfTodos: MutableList<Todo>
+    private var listOfTodos: MutableList<Todo>
 ): RecyclerView.Adapter<TodoListViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TodoListViewHolder {
         return TodoListViewHolder(
@@ -32,6 +34,16 @@ class TodoListAdapter(
 
     override fun onBindViewHolder(holder: TodoListViewHolder, position: Int) {
         holder.bindData(listOfTodos[position])
+    }
+
+    fun updateData(newList: MutableList<Todo>) {
+        listOfTodos = newList
+        notifyDataSetChanged()
+    }
+
+    fun addNewItem(todo: Todo) {
+        listOfTodos.add(0, todo)
+        notifyItemInserted(0)
     }
 
 }

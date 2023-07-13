@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="72dp"
+    android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     app:cardElevation="8dp"
     app:cardCornerRadius="8dp"
@@ -45,7 +45,6 @@
             android:text="Description"
             android:textSize="16sp"
             android:textStyle="normal"
-            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toEndOf="@id/cbItemTodo"
             app:layout_constraintTop_toBottomOf="@id/tvItemTodoTitle" />
 
@@ -55,9 +54,10 @@
             android:layout_height="wrap_content"
             android:fontFamily="casual"
             android:text="Date"
+            android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tvItemTodoTitle" />
+            app:layout_constraintTop_toBottomOf="@id/tvItemTodoDesc" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>
