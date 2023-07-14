@@ -2,7 +2,6 @@ package com.example.project2_todolistapp
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.room.Room
@@ -14,14 +13,14 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import java.util.Date
 import kotlin.concurrent.thread
 
-// TODO 4: Create a ViewHolder for the Recycler View
-// TODO 5: Create an Adapter for the Recycler View
-// TODO 6: Handle Click events on the ToDos
-// TODO 7: Add a Floating Action Button
-// TODO 8: Create a Dialog Box to create a ToDo (Bottom Sheet Optional)
-// TODO 9: Build a DBHelper class with (Entities, DAOs, Database and TypeConverters)
-// TODO 10: Push new ToDos in the DB
-// TODO 11: Whenever the App is launched sync your data with DB
+// TODO 4: Create a ViewHolder for the Recycler View Done
+// TODO 5: Create an Adapter for the Recycler View Done
+// TODO 6: Handle Click events on the ToDos Done
+// TODO 7: Add a Floating Action Button Done
+// TODO 8: Create a Dialog Box to create a ToDo (Bottom Sheet Optional) Done
+// TODO 9: Build a DBHelper class with (Entities, DAOs, Database and TypeConverters) Done
+// TODO 10: Push new ToDos in the DB Done
+// TODO 11: Whenever the App is launched sync your data with DB Done
 
 // Optional TODOs
 // 1. Create a user login/signup flow
@@ -34,16 +33,17 @@ import kotlin.concurrent.thread
 // 8. Add reminders on Todos that have a deadline
 // 9. Add new screen to display the tasks that are done
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), TodoStateChangedListener{
     private lateinit var binding: ActivityMainBinding
     private lateinit var database: TodoListDatabase
     private lateinit var adapter: TodoListAdapter
+    private var listOfTodos = mutableListOf<Todo>()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        adapter = TodoListAdapter(mutableListOf())
+        adapter = TodoListAdapter(mutableListOf(), this)
         binding.rvTodoList.layoutManager = LinearLayoutManager(this, RecyclerView.VERTICAL, false)
         binding.rvTodoList.adapter = adapter
 
@@ -51,14 +51,14 @@ class MainActivity : AppCompatActivity() {
             showBottomSheet()
         }
 
-        database = Room.databaseBuilder(
-            this@MainActivity,
-            TodoListDatabase::class.java,
-            "todoListDB"
-        ).build()
+        thread {
+            database = Room.databaseBuilder(
+                this@MainActivity,
+                TodoListDatabase::class.java,
+                "todoListDB"
+            ).build()
 
-        Thread {
-            val listOfTodos = database.todoDao().fetchAllTodos()
+            listOfTodos = database.todoDao().fetchAllTodos()
             adapter.updateData(listOfTodos)
         }
 
@@ -88,7 +88,8 @@ class MainActivity : AppCompatActivity() {
                 date = Date(System.currentTimeMillis())
             )
 
-            adapter.addNewItem(todo)
+            listOfTodos.add(0, todo)
+            adapter.updateData(listOfTodos)
 
             thread {
                 database.todoDao().insertTodo(todo)
@@ -98,5 +99,15 @@ class MainActivity : AppCompatActivity() {
         }
 
         dialog.show()
+    }
+
+    override fun onCheckStateChanged(position: Int) {
+        val currTodo = listOfTodos[position]
+        currTodo.isMarkedDone = !currTodo.isMarkedDone
+        listOfTodos[position] = currTodo
+        thread {
+            database.todoDao().updateTodo(currTodo)
+        }
+        adapter.updateData(listOfTodos)
     }
 }

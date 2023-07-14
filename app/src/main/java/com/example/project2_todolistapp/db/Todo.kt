@@ -8,7 +8,7 @@ import java.util.Date
 data class Todo(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
-    val isMarkedDone: Boolean = false,
+    var isMarkedDone: Boolean = false,
     val title: String,
     val desc: String,
     val date: Date
